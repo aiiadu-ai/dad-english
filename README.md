@@ -1,7 +1,53 @@
-# English — віджет для вивчення англійських слів
+<p align="center">
+  <img src="docs/screenshot.png" alt="English widget: a small always-on-top window showing a word with Know and Again buttons" width="420">
+</p>
 
-Маленьке віконце, яке завжди лежить поверх усіх вікон і раз на певний час показує одне англійське
-слово. Зроблено для людини з рівнем A0, яка працює в IT.
+# English
+
+**English** is a tiny always-on-top desktop widget that teaches vocabulary one word at a time. It was built for a beginner (A0) who works in IT: a word pops up every 50 minutes, you tap *Know* or *Again*, and it gets out of the way.
+Words come back on a **spaced-repetition** schedule (a check after 7 days), and phrasal verbs unlock only after you know their base verb.
+A moon button gives you "do not disturb" in one click. Runs on **Windows** and **Mac**.
+
+<p align="center">
+  <a href="https://github.com/aiiadu-ai/dad-english/releases/latest">
+    <img src="https://img.shields.io/badge/Download-latest%20release-2ea44f?style=for-the-badge" alt="Download the latest release">
+  </a>
+</p>
+
+---
+
+## Як зроблено
+
+**Стек.** [Electron](https://www.electronjs.org/) 33 і звичайні JavaScript, HTML та CSS, без фреймворків:
+для віджета на 200 слів вони не потрібні. Автотести — вбудований у Node `node --test`. Збірка програм —
+[electron-builder](https://www.electron.build/), автоматизація — GitHub Actions.
+
+**Інтервальне повторення (spaced repetition).** Слово проходить простий цикл:
+`нове` → Know → `чекає 7 днів` → перевірка → Know → `вивчене назавжди`. Again на будь-якому кроці
+відправляє слово в чергу повторів і цикл починається спочатку. Правила розкладу:
+- слова, в яких минув тиждень, показуються раніше за нові;
+- слово з черги повторів повертається після кожних 5 нових слів;
+- конструкції (`go on`, `come back`) відкриваються лише після Know на базовому дієслові (`go`, `come`),
+  це залежність «спершу основа, потім похідне».
+
+Уся ця логіка живе в окремому модулі `learning.js` без Electron, тому її можна перевіряти швидкими
+автотестами (`npm test`, 13 тестів), не запускаючи вікна.
+
+**Надійність у дрібницях.** Прогрес зберігається після кожної відповіді, пошкоджений або старий файл
+прогресу не перезаписується, а відкладається убік; друга копія програми не запускається; програма сама
+відкривається разом із комп'ютером; тестові налаштування лежать в окремому файлі, який не потрапляє в збірку.
+
+**Збірка на GitHub Actions для Mac і Windows.** Mac-програму на Windows не зібрати, тому все робить
+GitHub: один workflow ([`build.yml`](.github/workflows/build.yml)) на кожну версію збирає
+універсальний `.dmg` (Intel + Apple Silicon) на `macos-latest` і `.zip` для Windows на `windows-latest`,
+перед збіркою проганяє тести, а на тег `v*` публікує обидва файли на сторінці
+[Releases](https://github.com/aiiadu-ai/dad-english/releases).
+
+**Зроблено з Claude Code.** Автор не програміст і вчиться вайбкодингу: проєкт зроблено в парі з
+[Claude Code](https://claude.com/claude-code), ШІ-асистентом для програмування від Anthropic.
+Автор ставив вимоги, ухвалював рішення й перевіряв результат, а Claude Code писав код, тести та збірку.
+
+---
 
 ## Як це працює
 
@@ -20,11 +66,35 @@
 
 Апка запускається сама разом із комп'ютером, а прогрес зберігається у файлі й не губиться.
 
+## Завантажити
+
+Готові програми лежать на сторінці **[Releases](https://github.com/aiiadu-ai/dad-english/releases/latest)**.
+Відкрий найновіший реліз і завантаж файл для своєї системи:
+
+| Система | Файл |
+|---|---|
+| Windows 10/11 | `English-…-win-x64.zip` |
+| Mac (Intel і Apple Silicon) | `English-…-universal.dmg` |
+
+Програми не підписані, тому система при першому запуску попросить підтвердження — нижче описано, як.
+
+## Встановлення на Windows
+
+1. Завантаж `English-…-win-x64.zip`.
+2. Клацни на ньому правою кнопкою → **«Видобути все»** (Extract all) у **постійну папку**
+   (наприклад, `C:\Programs\English` або на робочий стіл). Не запускай прямо з архіву й не переноси
+   папку потім: автозапуск запам'ятовує, де лежить програма.
+3. Відкрий папку й двічі клікни **`English.exe`**.
+4. Якщо Windows пише **«Windows protected your PC»**: натисни **«Докладніше»** → **«Все одно виконати»**.
+
+Після першого запуску програма відкриватиметься сама разом із Windows. Вимкнути це можна, змінивши
+`"autostart": true` на `false` у файлі `resources\app\config.json` і один раз запустивши програму.
+
 ## Встановлення на Mac
 
 Для татового Mac. Програма не підписана Apple, тому macOS попросить дозволу при першому запуску.
 
-1. Завантаж файл `English-….dmg` (див. «Де взяти .dmg» нижче) і відкрий його.
+1. Завантаж `English-….dmg` і відкрий його.
 2. Перетягни **English** у папку **Applications** (Програми).
 3. Відкрий English з Applications. macOS скаже, що не може перевірити програму, — натисни **«Готово»**.
 4. Відкрий **Системні налаштування → Конфіденційність і безпека**, прокрути вниз до повідомлення про
@@ -38,17 +108,6 @@ xattr -cr /Applications/English.app
 ```
 
 Після цього відкрий English ще раз.
-
-### Де взяти .dmg
-
-.dmg збирає GitHub автоматично (Mac-програми не збираються на Windows):
-
-1. На сторінці репозиторію відкрий вкладку **Actions** → **Build Mac**.
-2. Натисни **Run workflow** (або створи тег `v1.0.0` — збірка запуститься сама).
-3. Коли збірка завершиться (зелена галочка), відкрий її й унизу, у розділі **Artifacts**, завантаж
-   `English-mac-dmg`. Це zip-архів, у ньому лежить `.dmg`.
-
-Збірка універсальна: працює і на Mac з Intel, і на Mac з Apple Silicon (M1 і новіші).
 
 ## Запуск локально (для розробки)
 
@@ -122,8 +181,9 @@ npm test
 - `examples` — приклади речень (поки не показуються, це наступний етап).
 - Пара `en` + `type` має бути унікальною (`call` як іменник і `call` як дієслово — це різні слова).
 
-Після зміни слів запусти `npm test`: він перевіряє, що логіка не зламалась. У зібраній програмі
-`words.json` лежить усередині `English.app` (Show Package Contents → Contents → Resources → app).
+Після зміни слів запусти `npm test`. У вже встановленій програмі `words.json` лежить:
+- Windows: `resources\app\words.json` у папці програми;
+- Mac: `English.app` → правою кнопкою «Показати вміст пакета» → `Contents/Resources/app/words.json`.
 
 ## Де зберігається прогрес
 
@@ -131,6 +191,15 @@ npm test
 - Mac: `~/Library/Application Support/dad-english/progress.json`
 
 Щоб почати вивчення спочатку, закрий програму й видали цей файл.
+
+## Як випустити нову версію
+
+Збірки робить GitHub Actions (файл `.github/workflows/build.yml`), бо Mac-програму на Windows не зібрати.
+
+- **Перевірка без публікації:** вкладка **Actions** → **Build** → **Run workflow**. Обидві збірки
+  з'являться внизу запуску в розділі **Artifacts**.
+- **Публікація:** змінити `"version"` у `package.json`, закомітити, створити тег виду `v1.0.1`
+  й запушити його. Збірка запуститься сама, а за кілька хвилин на сторінці Releases з'являться обидва файли.
 
 ## Структура проєкту
 
@@ -143,4 +212,5 @@ npm test
 | `moon.html` | іконка 🌙 |
 | `words.json` | 200 слів |
 | `words.test.json` | 12 слів для тестового режиму |
-| `.github/workflows/build-mac.yml` | автоматична збірка .dmg |
+| `.github/workflows/build.yml` | автоматична збірка для Windows і Mac |
+| `docs/screenshot.png` | скріншот віджета для README |

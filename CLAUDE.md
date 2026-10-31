@@ -14,7 +14,7 @@
 - `words.test.json` — 12 слів для тестового режиму
 - `config.json` — бойові налаштування, потрапляють у збірку (див. нижче)
 - `config.local.json` — локальні перекриття для тестів, **не в git** (див. нижче)
-- `README.md` — опис для людей (українською); `.github/workflows/build-mac.yml` — збірка .dmg
+- `README.md` — опис для людей (українською); `.github/workflows/build.yml` — збірка Mac + Windows + Release
 
 ## Запуск
 - Розробка: `npm.cmd start` (у PowerShell `npm start` блокується політикою скриптів).
@@ -93,10 +93,22 @@
 
 ## Збірка для Mac і GitHub
 - Репозиторій: https://github.com/aiiadu-ai/dad-english, гілка `main`.
-- Mac-програми не збираються на Windows, тому .dmg збирає GitHub Actions
-  (`.github/workflows/build-mac.yml`): запуск вручну (workflow_dispatch) і на теги `v*`;
-  `macos-latest`, Node 20, `npm ci` → `npm test` → `npm run dist:mac` → artifact `English-mac-dmg`.
-  `CSC_IDENTITY_AUTO_DISCOVERY=false` — без сертифіката Apple.
+- Mac-програми не збираються на Windows, тому збірки робить GitHub Actions
+  (`.github/workflows/build.yml`): запуск вручну (workflow_dispatch) і на теги `v*`.
+  Завдання `build-mac` (`macos-latest`) і `build-windows` (`windows-latest`): Node 20,
+  `npm ci` → `npm test` → `npm run dist:mac` / `npm run dist:win` → artifacts `English-mac-dmg`
+  і `English-windows-zip`. Завдання `release` (лише на тег `v*`, `contents: write`) збирає їх
+  у GitHub Release через `gh release create`. `CSC_IDENTITY_AUTO_DISCOVERY=false` — без підпису.
+- Випуск версії: підняти `version` у `package.json` (`npm.cmd version X.Y.Z --no-git-tag-version`
+  оновлює й lock), закомітити, `git tag vX.Y.Z`, запушити гілку й тег. Назви файлів у Release беруться
+  з `version`, тому тег і версія мають збігатися. Перший реліз — `v1.0.0`.
+- README: зверху скріншот `docs/screenshot.png` (його додає власниця вручну), англійський опис,
+  кнопка на останній Release, розділ «Як зроблено» (для портфоліо), технічні розділи нижче.
+- Готові збірки **не комітимо в git**: файл понад 100 МБ GitHub відхиляє, а Git розпухає.
+  Дистрибуція — лише через Releases.
+- Windows-збірка: electron-builder, target `zip` (x64), `English-<version>-win-x64.zip`;
+  вміст = папка з `English.exe` і `resources\app` (як у ручній портативній збірці, без `start.bat`).
+  Локально перевірено: архів збирається, `English.exe` запускається, автозапуск реєструється.
 - Налаштування збірки — у `package.json`, поле `build` (electron-builder 26): `appId`
   `com.aiiadu.english`, `productName` `English`, universal dmg (Intel + Apple Silicon),
   `asar: false` (слова й конфіг лишаються відкритими), `files` — білий список файлів.

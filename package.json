@@ -1,13 +1,14 @@
 {
   "name": "dad-english",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Віджет для вивчення англійських слів",
   "author": "aiiadu-ai",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "test": "node --test",
-    "dist:mac": "electron-builder --mac --universal --publish never"
+    "dist:mac": "electron-builder --mac --universal --publish never",
+    "dist:win": "electron-builder --win --x64 --publish never"
   },
   "devDependencies": {
     "electron": "^33.0.0",
@@ -37,6 +38,15 @@
           "arch": "universal"
         }
       ]
+    },
+    "win": {
+      "target": [
+        {
+          "target": "zip",
+          "arch": "x64"
+        }
+      ],
+      "artifactName": "${productName}-${version}-win-x64.${ext}"
     }
   }
 }
