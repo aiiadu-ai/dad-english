@@ -1,0 +1,14 @@
+[
+  {"en":"go","uk":"йти, їхати","type":"verb","examples":[{"en":"I go to the office.","uk":"Я їду в офіс."}]},
+  {"en":"come","uk":"приходити, приїжджати","type":"verb","examples":[{"en":"Can you come at ten?","uk":"Можеш прийти о десятій?"}]},
+  {"en":"time","uk":"час","type":"noun","examples":[{"en":"Do you have time today?","uk":"У тебе є час сьогодні?"}]},
+  {"en":"day","uk":"день","type":"noun","examples":[{"en":"It was a long day.","uk":"Це був довгий день."}]},
+  {"en":"week","uk":"тиждень","type":"noun","examples":[{"en":"See you next week.","uk":"Побачимось наступного тижня."}]},
+  {"en":"plan","uk":"план","type":"noun","examples":[{"en":"What is the plan?","uk":"Який план?"}]},
+  {"en":"plan","uk":"планувати","type":"verb","examples":[{"en":"We plan to grow.","uk":"Ми плануємо рости."}]},
+  {"en":"meeting","uk":"зустріч, мітинг","type":"noun","examples":[{"en":"The meeting starts at ten.","uk":"Зустріч починається о десятій."}]},
+  {"en":"go on","uk":"продовжувати","type":"phrase","base":"go","examples":[{"en":"Please, go on.","uk":"Продовжуйте, будь ласка."}]},
+  {"en":"go back","uk":"повертатися","type":"phrase","base":"go","examples":[{"en":"Let's go back to the first slide.","uk":"Повернімося до першого слайда."}]},
+  {"en":"come back","uk":"повертатися","type":"phrase","base":"come","examples":[{"en":"I'll come back in ten minutes.","uk":"Я повернуся через десять хвилин."}]},
+  {"en":"come up with","uk":"придумати, запропонувати","type":"phrase","base":"come","examples":[{"en":"We need to come up with a new idea.","uk":"Нам треба придумати нову ідею."}]}
+]

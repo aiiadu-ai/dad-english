@@ -1,0 +1,45 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #1f2937;
+  color: #f9fafb;
+  font-family: "Segoe UI", sans-serif;
+  border: 1px solid #374151;
+  user-select: none;
+  -webkit-app-region: drag; /* вікно можна тягнути за будь-яке місце */
+}
+
+.word {
+  font-size: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  padding: 0 8px;
+  -webkit-app-region: no-drag;
+}
+
+.hint { font-size: 12px; color: #9ca3af; min-height: 16px; }
+
+/* підпис лише в тестовому режимі */
+.debug { font-size: 10px; color: #fbbf24; min-height: 12px; }
+
+.buttons { display: flex; gap: 10px; margin-top: 6px; -webkit-app-region: no-drag; }
+
+button {
+  font-size: 14px;
+  padding: 6px 18px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #fff;
+}
+#know  { background: #16a34a; }
+#again { background: #dc2626; }
+button:hover { filter: brightness(1.15); }

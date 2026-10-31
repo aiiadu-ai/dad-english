@@ -1,0 +1,10 @@
+{
+  "intervalMs": 3000000,
+  "dndMs": 7200000,
+  "reviewDays": 7,
+  "autostart": true,
+  "testMode": false,
+  "showTestLabel": false,
+  "testIntervalMs": 5000,
+  "testReviewSeconds": 40
+}

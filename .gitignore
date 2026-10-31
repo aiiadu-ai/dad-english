@@ -1,0 +1,26 @@
+# залежності
+node_modules/
+
+# результати збірки
+dist/
+out/
+*.exe
+*.zip
+*.dmg
+dad-english-portable/
+
+# прогрес користувача і тестові налаштування (лише на цьому комп'ютері)
+progress*.json
+config.local.json
+
+# секрети
+.env
+.env.*
+
+# локальні налаштування інструментів
+.claude/settings.local.json
+
+# службове
+.DS_Store
+Thumbs.db
+npm-debug.log*

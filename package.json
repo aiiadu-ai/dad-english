@@ -1,0 +1,42 @@
+{
+  "name": "dad-english",
+  "version": "0.1.0",
+  "description": "Віджет для вивчення англійських слів",
+  "author": "aiiadu-ai",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test",
+    "dist:mac": "electron-builder --mac --universal"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^26.18.0"
+  },
+  "build": {
+    "appId": "com.aiiadu.english",
+    "productName": "English",
+    "asar": false,
+    "files": [
+      "main.js",
+      "learning.js",
+      "preload.js",
+      "renderer.js",
+      "index.html",
+      "style.css",
+      "moon.html",
+      "words.json",
+      "config.json",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.education",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": "universal"
+        }
+      ]
+    }
+  }
+}
