@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/screenshot.png" alt="English widget: a small always-on-top window showing a word with Know and Again buttons" width="420">
+  <img src="docs/widget.jpg" alt="English widget: a small always-on-top window showing a word with Know and Again buttons" width="420">
 </p>
 
 # English
@@ -213,4 +213,4 @@ npm test
 | `words.json` | 200 слів |
 | `words.test.json` | 12 слів для тестового режиму |
 | `.github/workflows/build.yml` | автоматична збірка для Windows і Mac |
-| `docs/screenshot.png` | скріншот віджета для README |
+| `docs/widget.jpg` | скріншот віджета для README |

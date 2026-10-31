@@ -13,6 +13,9 @@ dad-english-portable/
 progress*.json
 config.local.json
 
+# оригінал скріншота (на фоні особисте фото) — у README йде обрізаний docs/widget.jpg
+docs/screenshot.jpg
+
 # секрети
 .env
 .env.*
