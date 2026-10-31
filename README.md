@@ -16,36 +16,36 @@ A moon button gives you "do not disturb" in one click. Runs on **Windows** and *
 
 ---
 
-## Як зроблено
+## How it's built
 
-**Стек.** [Electron](https://www.electronjs.org/) 33 і звичайні JavaScript, HTML та CSS, без фреймворків:
-для віджета на 200 слів вони не потрібні. Автотести — вбудований у Node `node --test`. Збірка програм —
-[electron-builder](https://www.electron.build/), автоматизація — GitHub Actions.
+**Stack.** [Electron](https://www.electronjs.org/) 33 with plain JavaScript, HTML and CSS, no frameworks:
+a widget with 200 words doesn't need them. Tests use Node's built-in runner (`node --test`). The apps are
+packaged with [electron-builder](https://www.electron.build/) and built automatically by GitHub Actions.
 
-**Інтервальне повторення (spaced repetition).** Слово проходить простий цикл:
-`нове` → Know → `чекає 7 днів` → перевірка → Know → `вивчене назавжди`. Again на будь-якому кроці
-відправляє слово в чергу повторів і цикл починається спочатку. Правила розкладу:
-- слова, в яких минув тиждень, показуються раніше за нові;
-- слово з черги повторів повертається після кожних 5 нових слів;
-- конструкції (`go on`, `come back`) відкриваються лише після Know на базовому дієслові (`go`, `come`),
-  це залежність «спершу основа, потім похідне».
+**Spaced repetition.** A word goes through a simple cycle:
+`new` → Know → `waits 7 days` → review → Know → `learned for good`. Again at any step
+sends the word to a repeat queue and the cycle starts over. Scheduling rules:
+- words whose week has passed are shown before new ones;
+- a word from the repeat queue comes back after every 5 new words;
+- phrases (`go on`, `come back`) unlock only after Know on their base verb (`go`, `come`),
+  a "base first, derived second" dependency.
 
-Уся ця логіка живе в окремому модулі `learning.js` без Electron, тому її можна перевіряти швидкими
-автотестами (`npm test`, 13 тестів), не запускаючи вікна.
+All of this logic lives in a separate module, `learning.js`, which doesn't depend on Electron, so it can be
+checked with fast automated tests (`npm test`, 13 tests) without opening any windows.
 
-**Надійність у дрібницях.** Прогрес зберігається після кожної відповіді, пошкоджений або старий файл
-прогресу не перезаписується, а відкладається убік; друга копія програми не запускається; програма сама
-відкривається разом із комп'ютером; тестові налаштування лежать в окремому файлі, який не потрапляє в збірку.
+**Reliability in the details.** Progress is saved after every answer; a corrupted or old progress file is never
+overwritten, it is set aside instead; a second copy of the app can't be started; the app launches together with
+the computer; test settings live in a separate file that doesn't end up in the build.
 
-**Збірка на GitHub Actions для Mac і Windows.** Mac-програму на Windows не зібрати, тому все робить
-GitHub: один workflow ([`build.yml`](.github/workflows/build.yml)) на кожну версію збирає
-універсальний `.dmg` (Intel + Apple Silicon) на `macos-latest` і `.zip` для Windows на `windows-latest`,
-перед збіркою проганяє тести, а на тег `v*` публікує обидва файли на сторінці
-[Releases](https://github.com/aiiadu-ai/dad-english/releases).
+**GitHub Actions builds for Mac and Windows.** A Mac app can't be built on Windows, so GitHub does it all:
+one workflow ([`build.yml`](.github/workflows/build.yml)) builds a universal `.dmg` (Intel + Apple Silicon)
+on `macos-latest` and a `.zip` for Windows on `windows-latest` for every version, runs the tests before building,
+and on a `v*` tag publishes both files on the [Releases](https://github.com/aiiadu-ai/dad-english/releases) page.
 
-**Зроблено з Claude Code.** Автор не програміст і вчиться вайбкодингу: проєкт зроблено в парі з
-[Claude Code](https://claude.com/claude-code), ШІ-асистентом для програмування від Anthropic.
-Автор ставив вимоги, ухвалював рішення й перевіряв результат, а Claude Code писав код, тести та збірку.
+**Made with Claude Code.** The author is not a programmer and is learning vibe coding: the project was built
+in pair with [Claude Code](https://claude.com/claude-code), Anthropic's AI coding assistant.
+The author set the requirements, made the decisions and checked the results; Claude Code wrote the code,
+the tests and the build setup.
 
 ---
 
@@ -114,7 +114,7 @@ GitHub: один workflow ([`build.yml`](.github/workflows/build.yml)) на ко
 
 ## Встановлення на Mac
 
-Для татового Mac. Програма не підписана Apple, тому macOS попросить дозволу при першому запуску.
+Для Mac. Програма не підписана Apple, тому macOS попросить дозволу при першому запуску.
 
 1. Завантаж `English-….dmg` і відкрий його.
 2. Перетягни **English** у папку **Applications** (Програми).
