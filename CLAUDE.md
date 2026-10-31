@@ -100,6 +100,8 @@
 - Налаштування збірки — у `package.json`, поле `build` (electron-builder 26): `appId`
   `com.aiiadu.english`, `productName` `English`, universal dmg (Intel + Apple Silicon),
   `asar: false` (слова й конфіг лишаються відкритими), `files` — білий список файлів.
+- `dist:mac` має `--publish never`: на CI електрон-білдер сам намагається публікувати на GitHub
+  і падає без `GH_TOKEN` (перший запуск Action упав саме на цьому, хоча .dmg уже був зібраний).
 - `productName` свідомо **не** виставлений угорі `package.json`: інакше Electron змінить назву
   папки з прогресом (`dad-english` → `English`).
 - Без підпису Apple на Apple Silicon macOS може писати «пошкоджена» — лікується
