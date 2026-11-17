@@ -1,5 +1,8 @@
 * { box-sizing: border-box; }
 
+/* смуги прокрутки у віджеті не потрібні: вікно саме підганяється під вміст (див. fit() у renderer.js) */
+html, body { overflow: hidden; }
+
 body {
   margin: 0;
   height: 100vh;

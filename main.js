@@ -134,6 +134,19 @@ function createWindows() {
   });
   moon.setAlwaysOnTop(true, 'screen-saver');
   moon.loadFile('moon.html');
+
+  // Масштаб сторінки у віджеті й місяці завжди 100%: щоб випадковий зум (Ctrl + «+»/«-»)
+  // не збільшував вміст, а після перезапуску не лишався збереженим.
+  for (const win of [widget, moon]) {
+    const wc = win.webContents;
+    wc.setVisualZoomLevelLimits(1, 1);
+    wc.on('did-finish-load', () => wc.setZoomFactor(1));
+    wc.on('before-input-event', (event, input) => {
+      if ((input.control || input.meta) && ['+', '-', '=', '0'].includes(input.key)) {
+        event.preventDefault();
+      }
+    });
+  }
 }
 
 ipcMain.on('answered', (_e, kind) => {
@@ -143,6 +156,18 @@ ipcMain.on('answered', (_e, kind) => {
   }
   hideWidget();
   schedule(intervalMs);
+});
+
+// Віджет підганяється під висоту вмісту (не нижче базової і не вище за стелю).
+// Нижній край лишається на місці, тож вікно росте вгору і не налізає на місяць.
+const WIDGET_MIN_HEIGHT = 170;
+const WIDGET_MAX_HEIGHT = 420;
+ipcMain.on('fit', (_e, height) => {
+  if (!widget || widget.isDestroyed() || !Number.isFinite(height)) return;
+  const target = Math.min(Math.max(Math.ceil(height), WIDGET_MIN_HEIGHT), WIDGET_MAX_HEIGHT);
+  const b = widget.getBounds();
+  if (target === b.height) return;
+  widget.setBounds({ x: b.x, y: b.y + b.height - target, width: b.width, height: target });
 });
 
 // перетягування місяця: запам'ятовуємо стартову позицію і зміщуємо на dx, dy
