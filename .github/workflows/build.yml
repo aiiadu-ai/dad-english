@@ -92,7 +92,20 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          TITLE="English $GITHUB_REF_NAME"
+          NOTES="Завантаж файл для своєї системи: **English-...-win-x64.zip** для Windows, **English-...-universal.dmg** для Mac. Інструкція зі встановлення — у README."
+          FLAGS=""
+          case "$GITHUB_REF_NAME" in
+            # теги виду v1.0.2-hourly — окрема версія з паузою 1 година.
+            # Це "попередній" реліз, щоб він не ставав "Latest" і кнопка в README вела на звичайну версію.
+            *-hourly)
+              TITLE="English $GITHUB_REF_NAME — версія з паузою 1 година"
+              NOTES="Це версія з паузою **1 година** між словами (звичайна версія показує слово кожні 15 хвилин). Завантаж файл для своєї системи: **English-...-win-x64.zip** для Windows, **English-...-universal.dmg** для Mac. Інструкція зі встановлення — у README."
+              FLAGS="--prerelease"
+              ;;
+          esac
           gh release create "$GITHUB_REF_NAME" artifacts/* \
             --repo "$GITHUB_REPOSITORY" \
-            --title "English $GITHUB_REF_NAME" \
-            --notes "Завантаж файл для своєї системи: **English-...-win-x64.zip** для Windows, **English-...-universal.dmg** для Mac. Інструкція зі встановлення — у README."
+            --title "$TITLE" \
+            --notes "$NOTES" \
+            $FLAGS
