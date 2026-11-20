@@ -1,5 +1,5 @@
 {
-  "intervalMs": 3000000,
+  "intervalMs": 900000,
   "dndMs": 7200000,
   "reviewDays": 7,
   "autostart": true,

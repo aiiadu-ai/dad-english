@@ -4,7 +4,7 @@
 
 # English
 
-**English** is a tiny always-on-top desktop widget that teaches vocabulary one word at a time. It was built for a beginner (A0) who works in IT: a word pops up every 50 minutes, you tap *Know* or *Again*, and it gets out of the way.
+**English** is a tiny always-on-top desktop widget that teaches vocabulary one word at a time. It was built for a beginner (A0) who works in IT: a word pops up every 15 minutes, you tap *Know* or *Again*, and it gets out of the way.
 Words come back on a **spaced-repetition** schedule (a check after 7 days), and phrasal verbs unlock only after you know their base verb.
 A moon button gives you "do not disturb" in one click. Runs on **Windows** and **Mac**, fully **offline**: no account, no internet connection needed.
 
@@ -51,7 +51,7 @@ the tests and the build setup.
 
 ## Як це працює
 
-1. Раз на 50 хвилин з'являється **англійське слово**.
+1. Раз на 15 хвилин з'являється **англійське слово**.
 2. Клік по слову показує **український переклад** (ще клік — повертає англійське).
 3. Кнопки **Know** (знаю) і **Again** (ще раз). Після кліку віджет ховається до наступного слова.
 4. **Know** → слово ховається на **7 днів**. Через тиждень воно повертається на перевірку:
@@ -73,11 +73,11 @@ the tests and the build setup.
 | Що сталося | Коли буде наступне слово |
 |---|---|
 | Програму щойно запустили (або ввімкнули комп'ютер, якщо працює автозапуск) | **одразу**: одне слово показується при старті |
-| Натиснули **Know** або **Again** | через **50 хвилин** |
+| Натиснули **Know** або **Again** | через **15 хвилин** |
 | Клікнули 🌙, щоб увімкнути «не турбувати» | слово ховається, наступне прийде **само рівно через 2 години** після кліку |
-| Клікнули 🌙 ще раз, щоб вимкнути «не турбувати» | через **50 хвилин** після цього кліку, а не одразу |
+| Клікнули 🌙 ще раз, щоб вимкнути «не турбувати» | через **15 хвилин** після цього кліку, а не одразу |
 | Клікнули 🌙, поки слово ще на екрані | слово ховається без відповіді (ні Know, ні Again), далі як у «не турбувати» |
-| Усі слова вивчені або чекають перевірки | нічого не з'являється; програма перевіряє знову кожні 50 хвилин, і слово повернеться, коли мине 7 днів |
+| Усі слова вивчені або чекають перевірки | нічого не з'являється; програма перевіряє знову кожні 15 хвилин, і слово повернеться, коли мине 7 днів |
 
 Поки комп'ютер вимкнений, слова не з'являються.
 
@@ -153,7 +153,7 @@ npm test
 
 ### Тестовий режим
 
-Щоб не чекати 50 хвилин і 7 днів, створи файл `config.local.json` (він не потрапляє в git):
+Щоб не чекати 15 хвилин і 7 днів, створи файл `config.local.json` (він не потрапляє в git):
 
 ```json
 { "testMode": true }
@@ -167,7 +167,7 @@ npm test
 
 | Поле | Що означає | За замовчуванням |
 |---|---|---|
-| `intervalMs` | пауза між словами, мілісекунди | `3000000` (50 хв) |
+| `intervalMs` | пауза між словами, мілісекунди | `900000` (15 хв) |
 | `dndMs` | скільки триває «не турбувати» | `7200000` (2 год) |
 | `reviewDays` | через скільки днів перевірка після першого Know | `7` |
 | `autostart` | відкривати апку разом із комп'ютером | `true` |
