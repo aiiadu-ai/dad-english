@@ -6,6 +6,7 @@ const readJson = (name) =>
   JSON.parse(fs.readFileSync(path.join(__dirname, name), 'utf8'));
 
 const learning = require('./learning');
+const quizLogic = require('./quiz');
 
 // config.json — бойові налаштування (потрапляють у збірку).
 // config.local.json (необов'язковий, не потрапляє в git) перекриває окремі поля — для тестів.
@@ -22,8 +23,17 @@ const wordsFile = testMode && fs.existsSync(path.join(__dirname, 'words.test.jso
 const words = readJson(wordsFile);
 const intervalMs = testMode ? config.testIntervalMs : config.intervalMs;
 
-let widget, moon;
+// Тест (quiz): значення за замовчуванням у коді, щоб старий config.json без цих полів працював
+const quizEnabled = config.quizEnabled !== false;
+const quizTestIntervalMs = config.quizTestIntervalMs || 8000;
+const quizLearnedEvery = config.quizLearnedEvery || quizLogic.DEFAULT_LEARNED_EVERY;
+
+let widget, moon, quizWin;
 let timer = null;
+let quizTimer = null;
+let currentQuiz = null; // { word, answer, answered, id } — питання, яке зараз на екрані
+let lastQuizWord = null;
+let quizSeq = 0;
 let dnd = false;
 let lastWord = null;
 let currentWord = null;
@@ -102,6 +112,35 @@ function hideWidget() {
   widget.hide();
 }
 
+// ---- Тест (quiz): окреме вікно, раз на годину у випадковий момент ----
+
+// Тестовий режим: тест кожні кілька секунд. Бойовий: по одному на календарну годину.
+function scheduleQuiz(skipCurrentHour = false) {
+  clearTimeout(quizTimer);
+  if (!quizEnabled) return;
+  const delay = testMode
+    ? quizTestIntervalMs
+    : Math.max(1000, quizLogic.nextQuizAt(Date.now(), Math.random, skipCurrentHour) - Date.now());
+  quizTimer = setTimeout(showQuiz, delay);
+}
+
+function showQuiz() {
+  scheduleQuiz(true); // наступний — уже в наступній годині
+  // «Не турбувати» — цього разу тест пропускаємо. Вікно ще вантажиться — теж.
+  if (dnd || !quizWin || quizWin.isDestroyed() || quizWin.webContents.isLoading()) return;
+
+  const word = quizLogic.pickQuizWord(progress, words, Math.random, quizLearnedEvery, lastQuizWord);
+  if (!word) return; // ще не показано жодного слова
+  const q = quizLogic.buildQuiz(word, words);
+  if (!q) return;
+
+  lastQuizWord = word;
+  // нове питання замінює старе, якщо на нього не відповіли
+  currentQuiz = { word, answer: q.answer, answered: false, id: ++quizSeq };
+  quizWin.webContents.send('show-quiz', { question: q.question, options: q.options });
+  quizWin.showInactive();
+}
+
 function createWindows() {
   const { workArea } = screen.getPrimaryDisplay();
 
@@ -120,6 +159,22 @@ function createWindows() {
   widget.setAlwaysOnTop(true, 'screen-saver');
   widget.loadFile('index.html');
 
+  // Вікно тесту стоїть ліворуч від віджета; ховається лише після відповіді
+  quizWin = new BrowserWindow({
+    width: QUIZ_WIDTH,
+    height: QUIZ_INITIAL_HEIGHT,
+    x: workArea.x + workArea.width - 260 - 20 - 10 - QUIZ_WIDTH,
+    y: workArea.y + workArea.height - 84 - QUIZ_INITIAL_HEIGHT,
+    frame: false,
+    resizable: false,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    show: false,
+    webPreferences: { preload: path.join(__dirname, 'preload.js') },
+  });
+  quizWin.setAlwaysOnTop(true, 'screen-saver');
+  quizWin.loadFile('quiz.html');
+
   moon = new BrowserWindow({
     width: 64,
     height: 64,
@@ -137,7 +192,7 @@ function createWindows() {
 
   // Масштаб сторінки у віджеті й місяці завжди 100%: щоб випадковий зум (Ctrl + «+»/«-»)
   // не збільшував вміст, а після перезапуску не лишався збереженим.
-  for (const win of [widget, moon]) {
+  for (const win of [widget, moon, quizWin]) {
     const wc = win.webContents;
     wc.setVisualZoomLevelLimits(1, 1);
     wc.on('did-finish-load', () => wc.setZoomFactor(1));
@@ -168,6 +223,36 @@ ipcMain.on('fit', (_e, height) => {
   const b = widget.getBounds();
   if (target === b.height) return;
   widget.setBounds({ x: b.x, y: b.y + b.height - target, width: b.width, height: target });
+});
+
+// Вікно тесту так само підганяється під вміст, нижній край лишається на місці
+const QUIZ_WIDTH = 280;
+const QUIZ_INITIAL_HEIGHT = 320;
+const QUIZ_MIN_HEIGHT = 260;
+const QUIZ_MAX_HEIGHT = 420;
+ipcMain.on('quiz-fit', (_e, height) => {
+  if (!quizWin || quizWin.isDestroyed() || !Number.isFinite(height)) return;
+  const target = Math.min(Math.max(Math.ceil(height), QUIZ_MIN_HEIGHT), QUIZ_MAX_HEIGHT);
+  const b = quizWin.getBounds();
+  if (target === b.height) return;
+  quizWin.setBounds({ x: b.x, y: b.y + b.height - target, width: b.width, height: target });
+});
+
+// Відповідь на тест. Правильна — нічого не змінює; помилка — слово йде в чергу повторів (Again).
+const QUIZ_RESULT_MS = 2000;
+ipcMain.on('quiz-answer', (_e, chosen) => {
+  const q = currentQuiz;
+  if (!q || q.answered) return;
+  q.answered = true;
+  if (chosen !== q.answer) {
+    learning.answer(progress, q.word, 'again', Date.now(), config);
+    saveProgress();
+  }
+  quizWin.webContents.send('quiz-result', { chosen, correct: q.answer });
+  // ховаємо через 2 секунди, якщо за цей час не прийшло нове питання
+  setTimeout(() => {
+    if (currentQuiz && currentQuiz.id === q.id && quizWin && !quizWin.isDestroyed()) quizWin.hide();
+  }, QUIZ_RESULT_MS);
 });
 
 // перетягування місяця: запам'ятовуємо стартову позицію і зміщуємо на dx, dy
@@ -214,6 +299,7 @@ if (!app.requestSingleInstanceLock()) {
     loadProgress();
     createWindows();
     widget.webContents.once('did-finish-load', showWord);
+    scheduleQuiz();
   });
 }
 

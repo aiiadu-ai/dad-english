@@ -46,3 +46,27 @@ button {
 #know  { background: #16a34a; }
 #again { background: #dc2626; }
 button:hover { filter: brightness(1.15); }
+
+/* --- вікно тесту (quiz.html) --- */
+body.quiz { padding: 14px 0 20px; } /* запас зверху й знизу, щоб кнопки не впиралися в край */
+.qlabel { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: #a78bfa; }
+.qword { cursor: default; -webkit-app-region: drag; }
+.good { color: #4ade80; }
+.wrong { color: #f87171; }
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 16px 0;
+  -webkit-app-region: no-drag;
+}
+button.opt {
+  width: 100%;
+  background: #374151;
+  padding: 7px 10px;
+}
+button.opt:disabled { cursor: default; filter: none; }
+button.opt.ok  { background: #16a34a; }
+button.opt.bad { background: #dc2626; }

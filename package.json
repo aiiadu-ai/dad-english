@@ -1,6 +1,6 @@
 {
   "name": "dad-english",
-  "version": "1.0.2-hourly",
+  "version": "1.1.0-hourly",
   "description": "Віджет для вивчення англійських слів",
   "author": "aiiadu-ai",
   "main": "main.js",
@@ -21,9 +21,12 @@
     "files": [
       "main.js",
       "learning.js",
+      "quiz.js",
       "preload.js",
       "renderer.js",
       "index.html",
+      "quiz.html",
+      "quiz-renderer.js",
       "style.css",
       "moon.html",
       "words.json",
