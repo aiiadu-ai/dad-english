@@ -6,5 +6,8 @@
   "testMode": false,
   "showTestLabel": false,
   "testIntervalMs": 5000,
-  "testReviewSeconds": 40
+  "testReviewSeconds": 40,
+  "quizEnabled": true,
+  "quizLearnedEvery": 17,
+  "quizTestIntervalMs": 8000
 }

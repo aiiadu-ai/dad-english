@@ -10,6 +10,8 @@
 - `learning.test.js` — тести логіки (`node --test`)
 - `preload.js`, `renderer.js`, `index.html`, `style.css` — віджет зі словом
 - `moon.html` — окреме вікно з місяцем (клік = «не турбувати», можна перетягувати)
+- `quiz.js` — логіка тесту (без Electron, тестується окремо); `quiz.test.js` — її тести
+- `quiz.html`, `quiz-renderer.js` — окреме вікно тесту (стилі в спільному `style.css`)
 - `words.json` — 200 слів (`en`, `uk`, `type`: noun/verb/phrase, у phrase ще `base`, `examples`)
 - `words.test.json` — 12 слів для тестового режиму
 - `config.json` — бойові налаштування, потрапляють у збірку (див. нижче)
@@ -37,6 +39,28 @@
   `showTestLabel` — `true` показує на віджеті жовтий підпис (NEW / REVIEW / AGAIN) для
   відладки; за замовчуванням `false` (користувач не має бачити чергу й логіку).
   `testMode` вмикати лише в `config.local.json`, у `config.json` він має бути `false`.
+- `quizEnabled` (`true`), `quizLearnedEvery` (`17`), `quizTestIntervalMs` (`8000`) — тест (див. «Тест»).
+  Значення за замовчуванням є і в коді `main.js`, тому старий `config.json` без цих полів
+  (наприклад, власний на робочому столі власниці) працює без змін.
+
+## Тест (quiz)
+Раз на годину в окремому вікні (`quiz.html`, ліворуч від віджета, 280 px, висота підганяється
+через IPC `quiz-fit`) — українське слово й 4 англійські варіанти.
+- **Розклад:** `nextQuizAt` — один тест на календарну годину у випадкову хвилину. Після показу
+  наступний береться з наступної години (`skipCurrentHour`), тож двох за годину не буває.
+  У тестовому режимі — просто кожні `quizTestIntervalMs`.
+- **Не показується** під час «не турбувати» (цю годину пропущено) і поки в прогресі немає
+  жодного баченого слова. Уже відкритий тест місяць не ховає.
+- **Вікно не ховається саме:** лише через 2 с після відповіді. Без відповіді нове питання
+  замінює старе (власниця має два екрани й може не побачити вікно).
+- **Питання:** лише зі слів із записом у прогресі. Вивчені (`learned`) — із ймовірністю
+  `1/quizLearnedEvery` (≈ одне на 17), решта — слова, що ще вчаться (`again`, `waiting`).
+  Те саме слово двічі поспіль не питаємо, якщо є вибір.
+- **Варіанти:** 3 хибні того ж типу (`noun`/`verb`/`phrase`; якщо замало — з інших), інше `en`,
+  і **жодного спільного українського слова** (довше 2 літер) із питанням: інакше
+  `customer`/`client`, `solution`/`decision`, `error`/`mistake`, `deal`/`agreement` дали б дві правильні відповіді.
+  Тест на справжньому `words.json` це перевіряє.
+- **Відповідь:** правильна нічого не змінює; помилка → `learning.answer(..., 'again')`, слово в черзі повторів.
 
 ## Логіка вивчення
 Стан кожного слова зберігається у `progress.json` (`%APPDATA%\dad-english\`, у тестовому
@@ -99,7 +123,8 @@
 
 ## Портативна збірка для іншого ноутбука
 Без npm і Node.js. Папка = копія `node_modules\electron\dist` + код у `resources\app`
-(`main.js`, `learning.js`, `preload.js`, `renderer.js`, `index.html`, `style.css`, `moon.html`,
+(`main.js`, `learning.js`, `quiz.js`, `preload.js`, `renderer.js`, `index.html`, `quiz.html`,
+`quiz-renderer.js`, `style.css`, `moon.html`,
 `words.json`, `config.json`, `package.json`), `electron.exe` перейменований в `English.exe`,
 поруч `start.bat` (`start "" "%~dp0English.exe"`). Потім папка пакується в zip.
 `words.test.json` і `config.local.json` у збірку не потрапляють; `config.json` береться як є

@@ -21,9 +21,12 @@
     "files": [
       "main.js",
       "learning.js",
+      "quiz.js",
       "preload.js",
       "renderer.js",
       "index.html",
+      "quiz.html",
+      "quiz-renderer.js",
       "style.css",
       "moon.html",
       "words.json",

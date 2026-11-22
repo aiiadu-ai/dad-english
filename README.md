@@ -93,7 +93,12 @@ sends the word to a repeat queue and the cycle starts over. Scheduling rules:
   a "base first, derived second" dependency.
 
 All of this logic lives in a separate module, `learning.js`, which doesn't depend on Electron, so it can be
-checked with fast automated tests (`npm test`, 13 tests) without opening any windows.
+checked with fast automated tests (`npm test`, 28 tests) without opening any windows.
+
+**Hourly quiz.** Once per clock hour, at a random minute, a separate window asks for the translation of a
+Ukrainian word with four English options. Wrong options are picked so that only one answer can be right
+(no shared Ukrainian meaning, same part of speech), a wrong answer sends the word back to the repeat queue,
+and words already learned are asked only rarely. The quiz logic (`quiz.js`) is just as independent of Electron.
 
 **Reliability in the details.** Progress is saved after every answer; a corrupted or old progress file is never
 overwritten, it is set aside instead; a second copy of the app can't be started; the app launches together with
@@ -127,6 +132,21 @@ the tests and the build setup.
    ще клік — вимикає. Іконку можна перетягнути в зручне місце.
 
 Програма відкривається сама разом із комп'ютером (автозапуск), а прогрес зберігається у файлі й не губиться.
+
+### Тест (раз на годину)
+
+Раз на годину, у **випадковий момент**, окреме вікно (ліворуч від віджета зі словом) показує
+**українське слово** і **4 англійські варіанти**. Натисни правильний.
+
+- Правильна відповідь стає зеленою, неправильна червоною (правильна теж підсвічується), і через 2 секунди вікно ховається.
+- Вікно **не зникає саме**: воно висить, поки не відповіси (щоб не пропустити його на другому екрані).
+  Якщо не відповіла, за годину з'явиться нове питання, і воно замінить старе.
+- Рівно **один тест у кожну годину** (наприклад, о 14:23, потім о 15:48). Під час «не турбувати» тест не з'являється.
+- Питання беруться лише зі слів, які вже показували. **Вивчені** слова (двічі Know) трапляються рідко:
+  в середньому одне на 17 питань, решта питань про слова, які ще вчаться.
+- **Правильна відповідь** на розклад вивчення не впливає. **Помилка** відправляє слово в **Again** (чергу повторів).
+- Неправильні варіанти того ж типу (іменник до іменників) і ніколи не мають такого самого українського
+  перекладу, що й питання (наприклад, `customer` і `client` — обидва «клієнт», тож разом не потраплять).
 
 ### Коли з'являється наступне слово
 
@@ -191,6 +211,9 @@ npm test
 | `autostart` | відкривати апку разом із комп'ютером | `true` |
 | `testMode` | тестовий режим (див. вище) | `false` |
 | `testIntervalMs`, `testReviewSeconds` | швидкі інтервали тестового режиму | `5000`, `40` |
+| `quizEnabled` | чи показувати тест раз на годину | `true` |
+| `quizLearnedEvery` | у середньому одне питання з вивчених слів на стільки питань | `17` |
+| `quizTestIntervalMs` | пауза між тестами в тестовому режимі | `8000` |
 
 `config.local.json` перекриває окремі поля `config.json`.
 
@@ -253,7 +276,9 @@ npm test
 | `main.js` | вікна, таймери, збереження прогресу |
 | `learning.js` | уся логіка вибору слів (тестується окремо) |
 | `learning.test.js` | автотести логіки |
+| `quiz.js`, `quiz.test.js` | логіка тесту (питання, варіанти, розклад) і її автотести |
 | `index.html`, `style.css`, `renderer.js`, `preload.js` | віджет зі словом |
+| `quiz.html`, `quiz-renderer.js` | вікно тесту |
 | `moon.html` | іконка 🌙 |
 | `words.json` | 200 слів |
 | `words.test.json` | 12 слів для тестового режиму |
