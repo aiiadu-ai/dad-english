@@ -227,8 +227,8 @@ ipcMain.on('fit', (_e, height) => {
 
 // Вікно тесту так само підганяється під вміст, нижній край лишається на місці
 const QUIZ_WIDTH = 280;
-const QUIZ_INITIAL_HEIGHT = 290;
-const QUIZ_MIN_HEIGHT = 230;
+const QUIZ_INITIAL_HEIGHT = 320;
+const QUIZ_MIN_HEIGHT = 260;
 const QUIZ_MAX_HEIGHT = 420;
 ipcMain.on('quiz-fit', (_e, height) => {
   if (!quizWin || quizWin.isDestroyed() || !Number.isFinite(height)) return;

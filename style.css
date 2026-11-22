@@ -48,6 +48,7 @@ button {
 button:hover { filter: brightness(1.15); }
 
 /* --- вікно тесту (quiz.html) --- */
+body.quiz { padding: 14px 0 20px; } /* запас зверху й знизу, щоб кнопки не впиралися в край */
 .qlabel { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: #a78bfa; }
 .qword { cursor: default; -webkit-app-region: drag; }
 .good { color: #4ade80; }
