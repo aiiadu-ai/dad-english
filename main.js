@@ -26,7 +26,8 @@ const intervalMs = testMode ? config.testIntervalMs : config.intervalMs;
 // Тест (quiz): значення за замовчуванням у коді, щоб старий config.json без цих полів працював
 const quizEnabled = config.quizEnabled !== false;
 const quizTestIntervalMs = config.quizTestIntervalMs || 8000;
-const quizLearnedEvery = config.quizLearnedEvery || quizLogic.DEFAULT_LEARNED_EVERY;
+const quizEveryHours = config.quizEveryHours || 1; // один тест на стільки годин
+const quizLearnedEvery =config.quizLearnedEvery || quizLogic.DEFAULT_LEARNED_EVERY;
 
 let widget, moon, quizWin;
 let timer = null;
@@ -120,7 +121,7 @@ function scheduleQuiz(skipCurrentHour = false) {
   if (!quizEnabled) return;
   const delay = testMode
     ? quizTestIntervalMs
-    : Math.max(1000, quizLogic.nextQuizAt(Date.now(), Math.random, skipCurrentHour) - Date.now());
+    : Math.max(1000, quizLogic.nextQuizAt(Date.now(), Math.random, skipCurrentHour, quizEveryHours) - Date.now());
   quizTimer = setTimeout(showQuiz, delay);
 }
 
