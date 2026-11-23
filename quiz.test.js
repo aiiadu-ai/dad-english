@@ -158,6 +158,21 @@ test('nextQuizAt: якщо момент уже минув — наступна �
   assert.equal(t, at(15, 30));
 });
 
+test('nextQuizAt: раз на 2 години — один тест на проміжок 14–16, наступний уже в 16–18', () => {
+  assert.equal(quiz.nextQuizAt(at(14, 10), () => 0.5, false, 2), at(15, 0)); // середина проміжку 14–16
+  assert.equal(quiz.nextQuizAt(at(15, 30), () => 0.5, false, 2), at(17, 0)); // 15:00 минуло → проміжок 16–18
+  for (let i = 0; i < 300; i++) {
+    const t = quiz.nextQuizAt(at(15, 30), seeded(i + 1), true, 2);
+    assert.ok(t >= at(16, 0) && t < at(18, 0));
+  }
+});
+
+test('nextQuizAt: проміжки рахуються від півночі, непарна година теж у своєму проміжку', () => {
+  // 15:30 належить проміжку 14–16 (а не 15–17)
+  const t = quiz.nextQuizAt(at(15, 30), () => 0.99, false, 2);
+  assert.ok(t > at(15, 30) && t < at(16, 0));
+});
+
 test('nextQuizAt: після тесту наступний — точно в наступній годині, не в тій самій', () => {
   for (let i = 0; i < 300; i++) {
     const t = quiz.nextQuizAt(at(14, 5), seeded(i + 1), true);

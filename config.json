@@ -8,6 +8,7 @@
   "testIntervalMs": 5000,
   "testReviewSeconds": 40,
   "quizEnabled": true,
+  "quizEveryHours": 1,
   "quizLearnedEvery": 17,
   "quizTestIntervalMs": 8000
 }

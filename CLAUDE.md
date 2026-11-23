@@ -39,7 +39,9 @@
   `showTestLabel` — `true` показує на віджеті жовтий підпис (NEW / REVIEW / AGAIN) для
   відладки; за замовчуванням `false` (користувач не має бачити чергу й логіку).
   `testMode` вмикати лише в `config.local.json`, у `config.json` він має бути `false`.
-- `quizEnabled` (`true`), `quizLearnedEvery` (`17`), `quizTestIntervalMs` (`8000`) — тест (див. «Тест»).
+- `quizEnabled` (`true`), `quizEveryHours` (`1`; у гілці `hourly` — `2`), `quizLearnedEvery` (`17`),
+  `quizTestIntervalMs` (`8000`) — тест (див. «Тест»). `quizEveryHours` — довжина проміжку
+  (за місцевим часом від півночі: при 2 — 0–2, 2–4, …), у кожному один тест у випадковий момент.
   Значення за замовчуванням є і в коді `main.js`, тому старий `config.json` без цих полів
   (наприклад, власний на робочому столі власниці) працює без змін.
 

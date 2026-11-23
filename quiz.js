@@ -87,19 +87,23 @@ function buildQuiz(word, words, rand = Math.random) {
   };
 }
 
-// Коли показати наступний тест: один на кожну календарну годину, у випадкову хвилину.
-// skipCurrentHour = true — поточну годину вже відпрацювали, беремо наступну.
+// Коли показати наступний тест: один на кожен проміжок з blockHours годин (за замовчуванням 1 —
+// кожна календарна година; 2 — проміжки 0–2, 2–4, 4–6 … за місцевим часом), у випадковий момент.
+// skipCurrent = true — поточний проміжок уже відпрацювали, беремо наступний.
 // Повертає момент часу (мс від епохи).
-function nextQuizAt(now = Date.now(), rand = Math.random, skipCurrentHour = false) {
-  const hourStart = new Date(now);
-  hourStart.setMinutes(0, 0, 0);
-  const start = hourStart.getTime();
+function nextQuizAt(now = Date.now(), rand = Math.random, skipCurrent = false, blockHours = 1) {
+  const hours = Math.max(1, Math.floor(blockHours) || 1);
+  const blockMs = hours * HOUR_MS;
+  const d = new Date(now);
+  d.setMinutes(0, 0, 0);
+  d.setHours(Math.floor(d.getHours() / hours) * hours);
+  const start = d.getTime();
 
-  if (!skipCurrentHour) {
-    const candidate = start + Math.floor(rand() * HOUR_MS);
+  if (!skipCurrent) {
+    const candidate = start + Math.floor(rand() * blockMs);
     if (candidate > now) return candidate;
   }
-  return start + HOUR_MS + Math.floor(rand() * HOUR_MS);
+  return start + blockMs + Math.floor(rand() * blockMs);
 }
 
 module.exports = { DEFAULT_LEARNED_EVERY, ukTokens, pickQuizWord, buildQuiz, nextQuizAt };
