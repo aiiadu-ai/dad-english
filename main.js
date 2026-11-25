@@ -246,9 +246,13 @@ ipcMain.on('quiz-answer', (_e, chosen) => {
   if (!q || q.answered) return;
   q.answered = true;
   if (chosen !== q.answer) {
+    // помилка: слово в Again; у черзі тесту лишається попереду — спитаємо знову найближчим часом
     learning.answer(progress, q.word, 'again', Date.now(), config);
-    saveProgress();
+  } else {
+    // правильно: у кінець черги тесту, щоб не повторювалося, поки не пройдуть інші
+    quizLogic.markQuizzed(progress, q.word, Date.now());
   }
+  saveProgress();
   quizWin.webContents.send('quiz-result', { chosen, correct: q.answer });
   // ховаємо через 2 секунди, якщо за цей час не прийшло нове питання
   setTimeout(() => {

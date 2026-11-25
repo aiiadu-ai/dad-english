@@ -75,6 +75,45 @@ test('pickQuizWord: не повторює попереднє слово, кол�
   }
 });
 
+test('pickQuizWord: по черзі — спершу ті, що ще не питали, далі найдавніші', () => {
+  const st = stateWith([[sample[6], 'again'], [sample[7], 'again'], [sample[8], 'waiting']]);
+  st.words[learning.wordKey(sample[6])].quizAt = 1000;
+  st.words[learning.wordKey(sample[7])].quizAt = 500;
+  // sample[8] ще не питали — він перший
+  assert.equal(quiz.pickQuizWord(st, sample), sample[8]);
+  quiz.markQuizzed(st, sample[8], 2000);
+  assert.equal(quiz.pickQuizWord(st, sample), sample[7]); // найдавніший (500)
+});
+
+test('pickQuizWord: при правильних відповідях жодне слово не повторюється, поки не пройдуть усі', () => {
+  const seen = sample.slice(0, 10);
+  const st = stateWith(seen.map((w) => [w, 'again']));
+  const asked = [];
+  let last = null;
+  for (let i = 0; i < seen.length; i++) {
+    const w = quiz.pickQuizWord(st, sample, Math.random, 17, last);
+    asked.push(w);
+    quiz.markQuizzed(st, w, 10000 + i);
+    last = w;
+  }
+  assert.equal(new Set(asked).size, seen.length);
+});
+
+test('pickQuizWord: після помилки (без markQuizzed) слово лишається попереду черги', () => {
+  const st = stateWith([[sample[6], 'again'], [sample[7], 'again'], [sample[8], 'again']]);
+  quiz.markQuizzed(st, sample[7], 100);
+  quiz.markQuizzed(st, sample[8], 200);
+  // sample[6] питали, але помилились — quizAt не записано, тож воно знову першим (після іншого слова)
+  assert.equal(quiz.pickQuizWord(st, sample), sample[6]);
+});
+
+test('markQuizzed не змінює стан вивчення', () => {
+  const st = stateWith([[sample[6], 'waiting']]);
+  st.words[learning.wordKey(sample[6])].dueAt = 777;
+  quiz.markQuizzed(st, sample[6], 5);
+  assert.deepEqual(st.words[learning.wordKey(sample[6])], { status: 'waiting', dueAt: 777, quizAt: 5 });
+});
+
 test('buildQuiz: 4 різні варіанти, правильний є, у питанні — переклад', () => {
   for (let i = 0; i < 200; i++) {
     const q = quiz.buildQuiz(sample[6], sample, seeded(i + 1));
