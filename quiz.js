@@ -32,6 +32,9 @@ function ukTokens(text) {
 
 // Обирає слово для питання. Повертає слово зі списку або null.
 // Звичайні (Again / чекають повтору) — частіше, вивчені — раз на learnedEvery питань.
+// Усередині групи — по черзі: спершу слова, які тест ще не питав, далі ті, що питав найдавніше
+// (entry.quizAt — коли востаннє правильно відповіли в тесті). Так слово не повториться,
+// поки не пройдуть усі інші. Серед рівних — випадково.
 function pickQuizWord(state, words, rand = Math.random, learnedEvery = DEFAULT_LEARNED_EVERY, lastWord = null) {
   const entryOf = (w) => state.words[wordKey(w)];
   const seen = words.filter((w) => entryOf(w));
@@ -46,7 +49,18 @@ function pickQuizWord(state, words, rand = Math.random, learnedEvery = DEFAULT_L
   }
   if (pool.length > 1 && lastWord) pool = pool.filter((w) => w !== lastWord);
   if (!pool.length) return null;
-  return pool[Math.floor(rand() * pool.length)];
+
+  const askedAt = (w) => entryOf(w).quizAt || 0; // ще не питали — 0, тобто найперші
+  const oldest = Math.min(...pool.map(askedAt));
+  const candidates = pool.filter((w) => askedAt(w) === oldest);
+  return candidates[Math.floor(rand() * candidates.length)];
+}
+
+// Правильна відповідь у тесті: слово йде в кінець черги тесту (на розклад вивчення не впливає)
+function markQuizzed(state, word, now) {
+  const entry = state.words[wordKey(word)];
+  if (entry) entry.quizAt = now;
+  return state;
 }
 
 // Складає питання: { question, options (4, перемішані), answer }.
@@ -106,4 +120,4 @@ function nextQuizAt(now = Date.now(), rand = Math.random, skipCurrent = false, b
   return start + blockMs + Math.floor(rand() * blockMs);
 }
 
-module.exports = { DEFAULT_LEARNED_EVERY, ukTokens, pickQuizWord, buildQuiz, nextQuizAt };
+module.exports = { DEFAULT_LEARNED_EVERY, ukTokens, pickQuizWord, markQuizzed, buildQuiz, nextQuizAt };
